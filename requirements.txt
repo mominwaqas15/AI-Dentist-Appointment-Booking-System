@@ -2,3 +2,5 @@ sqlalchemy==2.0.38
 python-dotenv==1.0.1
 fastapi==0.115.8
 uvicorn==0.34.0
+passlib==1.7.4
+psycopg2-binary==2.9.10

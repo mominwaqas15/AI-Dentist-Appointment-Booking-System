@@ -48,7 +48,7 @@ class Appointment(Base):
     appointment_date = Column(Text)
     appointment_time = Column(Text)
     appointment_status = Column(Text, nullable=False)
-    appointment_created = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
     
     user = relationship("User", back_populates="appointments")
     dentist = relationship("Dentist", back_populates="appointments")

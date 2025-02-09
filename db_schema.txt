@@ -1,79 +1,80 @@
-CREATE TABLE User (
-   user_id INT,
-   full_name TEXT NOT NULL,
-   user_name TEXT NOT NULL,
-   user_phone_number TEXT NOT NULL,
-   user_email TEXT,
-   user_age INT NOT NULL,
-   user_password TEXT NOT NULL,
-   created_at DATE NOT NULL,
-   PRIMARY KEY (user_id)
+CREATE TABLE `User` (
+   `user_id` INT,
+   `full_name` TEXT NOT NULL,
+   `user_name` TEXT NOT NULL,
+   `user_phone_number` TEXT NOT NULL,
+   `user_email` TEXT,
+   `user_age` INT NOT NULL,
+   `user_password` TEXT NOT NULL,
+   `created_at` DATE NOT NULL,
+   PRIMARY KEY (`user_id`)
 );
 
-CREATE TABLE Appointment (
-   appointment_id INT,
-   user_id INT NOT NULL,
-   dentist_id INT NOT NULL,
-   appointment_date TEXT,
-   appointment_time TEXT,
-   appointment_status TEXT NOT NULL,
-   appointment_created TEXT NOT NULL,
-   PRIMARY KEY (appointment_id)
+CREATE TABLE `Appointment` (
+   `appointment_id` INT,
+   `user_id` INT NOT NULL,
+   `dentist_id` INT NOT NULL,
+   `appointment_date` TEXT,
+   `appointment_time` TEXT,
+   `appointment_status` TEXT NOT NULL,
+   `created_at` TEXT NOT NULL,
+   PRIMARY KEY (`appointment_id`)
 );
 
-CREATE TABLE Dentist (
-   dentist_id INT,
-   dentist_name TEXT NOT NULL,
-   years_of_experience INT,
-   dentist_speciality TEXT,
-   dentist_clinic TEXT NOT NULL,
-   dentist_phone_number TEXT NOT NULL,
-   dentist_email TEXT,
-   dentist_address TEXT NOT NULL,
-   dentist_working_hours TEXT NOT NULL,
-   created_at TEXT NOT NULL,
-   PRIMARY KEY (dentist_id)
+CREATE TABLE `Dentist` (
+   `dentist_id` INT,
+   `dentist_name` TEXT NOT NULL,
+   `years_of_experience` INT,
+   `dentist_speciality` TEXT,
+   `dentist_clinic` TEXT NOT NULL,
+   `dentist_phone_number` TEXT NOT NULL,
+   `dentist_email` TEXT,
+   `dentist_address` TEXT NOT NULL,
+   `dentist_working_hours` TEXT NOT NULL,
+   `created_at` TEXT NOT NULL,
+   PRIMARY KEY (`dentist_id`)
 );
 
-CREATE TABLE Service (
-   service_id INT,
-   service_name TEXT NOT NULL,
-   service_description TEXT,
-   PRIMARY KEY (service_id)
+CREATE TABLE `Service` (
+   `service_id` INT,
+   `service_name` TEXT NOT NULL,
+   `service_description` TEXT,
+   PRIMARY KEY (`service_id`)
 );
 
-CREATE TABLE Dentist_Service (
-   dentist_service_id INT,
-   dentist_id INT,
-   service_id INT,
-   PRIMARY KEY (dentist_service_id)
+CREATE TABLE `Dentist_Service` (
+   `dentist_service_id` INT,
+   `dentist_id` INT,
+   `service_id` INT,
+   PRIMARY KEY (`dentist_service_id`)
 );
 
-CREATE TABLE Appointment_Preference (
-   appointment_preference_id INT,
-   user_id INT NOT NULL,
-   dentist_id INT NOT NULL,
-   patient_name TEXT NOT NULL,
-   patient_gender TEXT NOT NULL,
-   patient_age TEXT NOT NULL,
-   patient_phone_number TEXT NOT NULL,
-   patient_email_address TEXT NOT NULL,
-   preferred_dates TEXT NOT NULL,
-   relation TEXT,
-   special_notes TEXT,
-   created_at TEXT NOT NULL,
-   PRIMARY KEY (appointment_preference_id)
+CREATE TABLE `Appointment_Preference` (
+   `appointment_preference_id` INT,
+   `user_id` INT NOT NULL,
+   `dentist_id` INT NOT NULL,
+   `patient_name` TEXT NOT NULL,
+   `patient_gender` TEXT NOT NULL,
+   `patient_age` TEXT NOT NULL,
+   `patient_phone_number` TEXT NOT NULL,
+   `patient_email_address` TEXT NOT NULL,
+   `preferred_dates` TEXT NOT NULL,
+   `relation` TEXT,
+   `special_notes` TEXT,
+   `created_at` TEXT NOT NULL,
+   PRIMARY KEY (`appointment_preference_id`)
 );
 
 
-ALTER TABLE Appointment ADD CONSTRAINT FK_f1950959-ada2-49d7-adc4-c55b33c82d23 FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE ;
+ALTER TABLE `Appointment` ADD CONSTRAINT `FK_f1950959-ada2-49d7-adc4-c55b33c82d23` FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ;
 
-ALTER TABLE Appointment ADD CONSTRAINT FK_d89ce7fb-8f7f-44e0-abcc-2531016f7264 FOREIGN KEY (dentist_id) REFERENCES Dentist(dentist_id)  ;
+ALTER TABLE `Appointment` ADD CONSTRAINT `FK_d89ce7fb-8f7f-44e0-abcc-2531016f7264` FOREIGN KEY (`dentist_id`) REFERENCES `Dentist`(`dentist_id`)  ;
 
-ALTER TABLE Dentist_Service ADD CONSTRAINT FK_466a0cb3-74e4-4710-9ac7-d65b0cde6b80 FOREIGN KEY (dentist_id) REFERENCES Dentist(dentist_id)  ;
+ALTER TABLE `Dentist_Service` ADD CONSTRAINT `FK_466a0cb3-74e4-4710-9ac7-d65b0cde6b80` FOREIGN KEY (`dentist_id`) REFERENCES `Dentist`(`dentist_id`)  ;
 
-ALTER TABLE Dentist_Service ADD CONSTRAINT FK_394abb41-72c0-4bb1-b1da-04759971920a FOREIGN KEY (service_id) REFERENCES Service(service_id)  ;
+ALTER TABLE `Dentist_Service` ADD CONSTRAINT `FK_394abb41-72c0-4bb1-b1da-04759971920a` FOREIGN KEY (`service_id`) REFERENCES `Service`(`service_id`)  ;
 
-ALTER TABLE Appointment_Preference ADD CONSTRAINT FK_d83dbe24-51be-4487-b4b3-4820bfec369e FOREIGN KEY (user_id) REFERENCES User(user_id)  ;
+ALTER TABLE `Appointment_Preference` ADD CONSTRAINT `FK_d83dbe24-51be-4487-b4b3-4820bfec369e` FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`)  ;
 
-ALTER TABLE Appointment_Preference ADD CONSTRAINT FK_fc7ce10a-5660-47d3-9225-fd18933b0690 FOREIGN KEY (dentist_id) REFERENCES Dentist(dentist_id)  ;
+ALTER TABLE `Appointment_Preference` ADD CONSTRAINT `FK_fc7ce10a-5660-47d3-9225-fd18933b0690` FOREIGN KEY (`dentist_id`) REFERENCES `Dentist`(`dentist_id`)  ;
+
