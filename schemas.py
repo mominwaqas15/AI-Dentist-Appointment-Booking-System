@@ -67,18 +67,15 @@ class AppointmentPreferenceResponse(BaseModel):
 class AppointmentCreate(BaseModel):
     user_id: int
     dentist_id: int
-    appointment_date: str
-    appointment_time: str
-    appointment_status: str
 
 class AppointmentResponse(BaseModel):
     appointment_id: int
     user_id: int
     dentist_id: int
-    appointment_date: str
-    appointment_time: str
+    appointment_date: Optional[str] = ""
+    appointment_time: Optional[str] = ""
     appointment_status: str
-    created_at: datetime
+    created_at: str
 
 class AppointmentResponse(BaseModel):
     appointment_id: int

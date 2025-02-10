@@ -93,18 +93,19 @@ def create_appointment(db: Session, appointment: schemas.AppointmentCreate):
         new_appointment = Appointment(
             user_id=appointment.user_id,
             dentist_id=appointment.dentist_id,
-            appointment_date=appointment.appointment_date,
-            appointment_time=appointment.appointment_time,
-            appointment_status=appointment.appointment_status,
+            appointment_date= "",
+            appointment_time= "",
+            appointment_status="In Progress",
             created_at=datetime.utcnow()
         )
+        
         db.add(new_appointment)
         db.commit()
         db.refresh(new_appointment)
         return new_appointment
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Invalid user_id or dentist_id. Please provide valid references.")    
+        raise HTTPException(status_code=400, detail="Invalid user_id or dentist_id. Please provide valid references.")
     
 def get_appointments_by_user(db: Session, user_id: int):
     return db.query(Appointment).filter(Appointment.user_id == user_id).all()    
