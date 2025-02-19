@@ -1,12 +1,10 @@
 from sqlalchemy.orm import Session
 from models import User, Service, Dentist, Appointment, AppointmentPreference, DentistService
 from datetime import datetime
-# from passlib.context import CryptContext
 import schemas
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_user_by_email(db: Session, email: str):
     """
@@ -109,3 +107,9 @@ def create_appointment(db: Session, appointment: schemas.AppointmentCreate):
     
 def get_appointments_by_user(db: Session, user_id: int):
     return db.query(Appointment).filter(Appointment.user_id == user_id).all()    
+
+def get_services_by_dentist(db: Session, dentist_id: int):
+    services = db.query(Service).join(DentistService).filter(DentistService.dentist_id == dentist_id).all()
+    if not services:
+        raise HTTPException(status_code=404, detail="No services found for this dentist.")
+    return services

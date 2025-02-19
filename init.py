@@ -3,6 +3,7 @@ from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from db_conn import create_db
 from dotenv import load_dotenv
+from typing import List
 import schemas
 import uvicorn, os
 import models
@@ -57,12 +58,18 @@ def get_service_dentists(service_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No dentists found for this service.")
     return dentists
 
+@app.get("/get-dentist-services/{dentist_id}", response_model=List[schemas.DentistServiceResponse])
+def get_dentist_services(dentist_id: int, db: Session = Depends(get_db)):
+    services = crud.get_services_by_dentist(db, dentist_id)
+    return services
+
+
 @app.get("/get-dentists", response_model=list[schemas.DentistResponse])
 def get_dentists(db: Session = Depends(get_db)):
     dentists = crud.get_all_dentists(db)
     return dentists
 
-@app.post("/get-appointment-preferences", response_model=schemas.AppointmentPreferenceResponse)
+@app.post("/store-appointment-preferences", response_model=schemas.AppointmentPreferenceResponse)
 def get_appointment_preferences(preference: schemas.AppointmentPreferenceCreate, db: Session = Depends(get_db)):
     appointment_preference = crud.create_appointment_preference(db, preference)
     return appointment_preference

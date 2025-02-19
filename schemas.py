@@ -88,3 +88,8 @@ class AppointmentResponse(BaseModel):
 
 class UserAppointmentListResponse(BaseModel):
     appointments: List[AppointmentResponse] 
+
+class DentistServiceResponse(BaseModel):
+    service_id: int
+    service_name: str
+    service_description: str    
