@@ -90,4 +90,4 @@ def get_user_appointments(user_id: int, db: Session = Depends(get_db)):
     return appointments
 
 if __name__ == "__main__":
-    uvicorn.run("init:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("init:app", host=HOST, port=int(PORT), reload=True)
