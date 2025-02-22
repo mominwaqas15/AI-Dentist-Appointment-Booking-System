@@ -15,18 +15,29 @@ class AppointmentDetails(BaseModel):
 def get_appointment_details_prompt():
     return """You are an AI assistant tasked with extracting appointment details from a conversation between a receptionist/agent and a dentist. Given the transcript, extract and format the following details:
 
-- `appointment_date`: The date of the appointment in `YYYY-MM-DD` format as a Python `datetime` object.
-- `appointment_time`: The time of the appointment as a `datetime` object.
-- `appointment_status`: The status of the appointment, which can be **Booked**, **Canceled**, or **Rescheduled** or "Pending".
+- `appointment_date`: The date of the appointment in `YYYY-MM-DD` format as a Python `datetime` object. If no explicit date is mentioned, this should be `null`.
+- `appointment_time`: The time of the appointment in `HH:MM:SS` format as a `datetime` object. If no explicit time is mentioned, this should be `null`.
+- `appointment_status`: The status of the appointment, which can be **Booked**, **Canceled**, **Rescheduled**, or **Pending**.
 
 ### Important Instructions:
 - The year is **2025**.
-- If the transcript **does not explicitly mention a confirmed appointment date and time**, do **not** infer or assume any fake values.
-- If no appointment is explicitly booked, return:
+- **Do not infer or assume any values** for `appointment_date` or `appointment_time` if they are not explicitly mentioned in the transcript.
+- If the transcript **does not explicitly mention a confirmed appointment date and time**, return:
   - `"appointment_status": "Pending"`
-  - `"appointment_date": None`
-  - `"appointment_time": None`
-- If the conversation suggests a rescheduling but no confirmed new date/time, return `"appointment_status": "Rescheduled"` and set `"appointment_date"` and `"appointment_time"` to `None`.
+  - `"appointment_date": null`
+  - `"appointment_time": null`
+- If the conversation suggests a rescheduling but no confirmed new date/time is mentioned, return:
+  - `"appointment_status": "Rescheduled"`
+  - `"appointment_date": null`
+  - `"appointment_time": null`
+- If the appointment is explicitly canceled, return:
+  - `"appointment_status": "Canceled"`
+  - `"appointment_date": null`
+  - `"appointment_time": null`
+- If the appointment is explicitly booked with a confirmed date and time, return:
+  - `"appointment_status": "Booked"`
+  - `"appointment_date": "YYYY-MM-DD"`
+  - `"appointment_time": "HH:MM:SS"`
 
 Your response must be a valid JSON object with the following structure:
 

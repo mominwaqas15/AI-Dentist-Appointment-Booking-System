@@ -4,11 +4,14 @@ from sqlalchemy.orm import Session
 from db_conn import create_db
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import BackgroundTasks
 from typing import List
 import schemas, gpt, call_handler
 import uvicorn, os
 import models
 import crud
+from datetime import datetime
+from models import Appointment
 
 engine, SessionLocal = create_db()
 models.Base.metadata.create_all(bind=engine)
@@ -31,7 +34,6 @@ app.add_middleware(
 
 
 load_dotenv()
-
 
 
 def get_db():
@@ -92,10 +94,29 @@ def get_appointment_preferences(preference: schemas.AppointmentPreferenceCreate,
     appointment_preference = crud.create_appointment_preference(db, preference)
     return appointment_preference
 
-@app.post("/book-appointment", response_model=schemas.AppointmentResponse)
-def book_appointment(appointment: schemas.AppointmentCreate, db: Session = Depends(get_db)):
-    booked_appointment = crud.create_appointment(db, appointment)
-    return booked_appointment
+@app.post("/book-appointment", response_model=dict)
+def book_appointment(
+    appointment: schemas.AppointmentCreate, 
+    background_tasks: BackgroundTasks, 
+    db: Session = Depends(get_db)
+):
+    # Create the initial appointment record with status "Processing"
+    new_appointment = Appointment(
+        user_id=appointment.user_id,
+        dentist_id=appointment.dentist_id,
+        appointment_status="Processing",
+        created_at=datetime.utcnow()
+    )
+    
+    db.add(new_appointment)
+    db.commit()
+    db.refresh(new_appointment)
+
+    # Run the call processing and appointment update in the background
+    background_tasks.add_task(crud.process_appointment_in_background, db, appointment, new_appointment)
+
+    # Return an immediate response
+    return {"message": "Appointment request received. Processing in background.", "appointment_id": new_appointment.appointment_id}
 
 @app.get("/get-user-appointment/{user_id}", response_model=list[schemas.AppointmentResponse])
 def get_user_appointments(user_id: int, db: Session = Depends(get_db)):

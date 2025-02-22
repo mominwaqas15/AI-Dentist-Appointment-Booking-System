@@ -154,3 +154,56 @@ def get_services_by_dentist(db: Session, dentist_id: int):
     if not services:
         raise HTTPException(status_code=404, detail="No services found for this dentist.")
     return services
+
+def process_appointment_in_background(db: Session, appointment: schemas.AppointmentCreate, new_appointment):
+    """Background task to handle the call and update the appointment."""
+    try:
+        # Fetch user appointment preference details
+        preference = db.query(AppointmentPreference).filter(AppointmentPreference.appointment_preference_id == appointment.appointment_preference_id).first()
+        if not preference:
+            return
+
+        # Fetch dentist details
+        dentist = db.query(Dentist).filter(Dentist.dentist_id == appointment.dentist_id).first()
+        if not dentist:
+            return
+
+        # Convert fetched details into dictionaries
+        patient_preferences = {
+            "patient_name": preference.patient_name,
+            "patient_gender": preference.patient_gender,
+            "patient_age": preference.patient_age,
+            "preferred_dates": preference.preferred_dates,
+            "relation": preference.relation,
+            "special_notes": preference.special_notes
+        }
+
+        dentist_details = {
+            "dentist_name": dentist.dentist_name,
+            "dentist_speciality": dentist.dentist_speciality,
+            "dentist_clinic": dentist.dentist_clinic,
+            "dentist_phone_number": dentist.dentist_phone_number,
+            "dentist_address": dentist.dentist_address
+        }
+
+        # Call the CallHandler
+        from call_handler import CallHandler
+        call_handler = CallHandler(patient_preferences, dentist_details)
+        call_response = call_handler.process_call()
+
+        if not call_response or "appointment_details" not in call_response:
+            return
+
+        appointment_details = call_response["appointment_details"]
+        print("Appointment Details: ", appointment_details)
+
+        # Update the appointment in the database
+        appointment_record = db.query(Appointment).filter(Appointment.appointment_id == new_appointment.appointment_id).first()
+        if appointment_record:
+            appointment_record.appointment_date = appointment_details.appointment_date
+            appointment_record.appointment_time = appointment_details.appointment_time
+            appointment_record.appointment_status = appointment_details.appointment_status
+            db.commit()
+
+    except Exception as e:
+        print(f"Error processing appointment: {str(e)}")

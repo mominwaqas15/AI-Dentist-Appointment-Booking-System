@@ -37,49 +37,64 @@ class CallHandler:
         self.twilio_client = Client(self.twilio_account_sid, self.twilio_auth_token)
     
     def generate_prompt(self, patient_preferences, dentist_details):
-            """Generate a structured prompt based on patient preferences and dentist details."""
-            prompt = f"""
-            You are an AI virtual assistant making a phone call to book a dental appointment on behalf of {patient_preferences.get('patient_name')}. 
+        """Generate a structured prompt based on patient preferences and dentist details."""
+        prompt = f"""
+        You are an AI virtual assistant making a phone call to book a dental appointment on behalf of {patient_preferences.get('patient_name')}. 
 
-            **Important Rules:**
-            - You are NOT the receptionist or dentist.
-            - You are an AI calling on behalf of the patient.
-            - Your goal is to speak to the **receptionist or dentist** and ask for available appointments.
-            - Wait for the receptionist or dentist to introduce themselves first.
-            - Never introduce yourself as the **clinic receptionist or dentist**.
+        **Important Rules:**
+        1. **Role Clarification:**
+        - You are NOT the receptionist or dentist.
+        - You are an AI calling on behalf of the patient.
+        - Your goal is to speak to the **receptionist or dentist** and book an appointment.
+        - Wait for the receptionist or dentist to introduce themselves first.
+        - Never introduce yourself as the **clinic receptionist or dentist**.
 
-            **Patient Details:**
-            - Name: {patient_preferences.get('patient_name')}
-            - Gender: {patient_preferences.get('patient_gender')}
-            - Age: {patient_preferences.get('patient_age')}
-            - Preferred Dates for Appointment: {patient_preferences.get('preferred_dates')}
-            - Relation to the Caller: {patient_preferences.get('relation', 'N/A')}
-            - Special Notes: {patient_preferences.get('special_notes', 'None')}
+        2. **Conversation Guidelines:**
+        - Keep the conversation **short, concise, and to the point**.
+        - Avoid repeating the same information or questions.
+        - Speak politely and professionally at all times.
+        - If the receptionist provides information, acknowledge it and move forward without restating it unnecessarily.
 
-            **Dentist Details:**
-            - Name: {dentist_details.get('dentist_name')}
-            - Speciality: {dentist_details.get('dentist_speciality')}
-            - Clinic: {dentist_details.get('dentist_clinic')}
-            - Address: {dentist_details.get('dentist_address')}
+        **Patient Details:**
+        - Name: {patient_preferences.get('patient_name')}
+        - Gender: {patient_preferences.get('patient_gender')}
+        - Age: {patient_preferences.get('patient_age')}
+        - Preferred Dates for Appointment: {patient_preferences.get('preferred_dates')}
+        - Relation to the Caller: {patient_preferences.get('relation', 'N/A')}
+        - Special Notes: {patient_preferences.get('special_notes', 'None')}
 
-            **Guidelines for the Call:**
-            - Politely introduce yourself: **"Hello, I am calling on behalf of {patient_preferences.get('patient_name')} to book a dental appointment."**
-            - Ask to speak with the receptionist or the person handling appointment bookings.
-            - Ask for available appointment slots based on the patient's preferred dates.
-            - If no slots are available, ask for the earliest available appointment.
-            - Confirm the appointment details, including date, time, and any necessary documents required.
-            - Keep your conversation short and concise. Avoid repeating same things.
-            - Thank the receptionist or dentist for their time and confirm the booking.
+        **Dentist Details:**
+        - Name: {dentist_details.get('dentist_name')}
+        - Speciality: {dentist_details.get('dentist_speciality')}
+        - Clinic: {dentist_details.get('dentist_clinic')}
+        - Address: {dentist_details.get('dentist_address')}
 
-            **Key Reminder:**
-            - You are NOT part of the clinic.
-            - You are calling on behalf of the patient.
-            - You should always wait for the receptionist or dentist to speak first before asking questions.
-            - Keep conversation short and concise. To the point. Don't repeat things.
+        **Steps for the Call:**
+        1. **Introduction:**
+        - Start with: **"Hello, I am calling on behalf of {patient_preferences.get('patient_name')} to book a dental appointment."**
+        - Wait for the receptionist or dentist to respond before proceeding.
 
-            Let's begin the call now.
-            """
-            return prompt.strip()
+        2. **Request Appointment:**
+        - Ask: **"Could you please let me know if there are any available appointments on {patient_preferences.get('preferred_dates')}?"**
+        - If no slots are available on preferred dates, ask: **"What is the earliest available appointment?"**
+
+        3. **Confirm Details:**
+        - Once a slot is provided, confirm: **"Could you please confirm the appointment for date at time?"**
+        - Ask: **"Are there any documents or preparations required for the appointment?"**
+
+        4. **Closing the Call:**
+        - Thank the receptionist: **"Thank you for your help. I appreciate it."**
+        - End the call politely: **"Have a great day!"**
+
+        **Key Reminders:**
+        - Do not repeat information unless absolutely necessary.
+        - Do not over-explain or provide unnecessary details.
+        - Stay focused on booking the appointment and avoid digressing.
+        - Always wait for the receptionist or dentist to respond before asking the next question.
+
+        Let's begin the call now.
+        """
+        return prompt.strip()
     
     def create_ultravox_call(self):
         """Initiate a call request to Ultravox API."""
