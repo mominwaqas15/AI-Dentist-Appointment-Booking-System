@@ -5,7 +5,7 @@ from db_conn import create_db
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
-import schemas
+import schemas, gpt, call_handler
 import uvicorn, os
 import models
 import crud
@@ -31,6 +31,8 @@ app.add_middleware(
 
 
 load_dotenv()
+
+
 
 def get_db():
     db = SessionLocal()
@@ -60,7 +62,7 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
     user = crud.authenticate_user(db, username=user_credentials.username, password=user_credentials.password)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    return {"message": "Login successful", "user": user.user_name}
+    return {"message": "Login successful", "user": user}
 
 @app.get("/get-services", response_model=list[schemas.ServiceResponse])
 def get_services(db: Session = Depends(get_db)):

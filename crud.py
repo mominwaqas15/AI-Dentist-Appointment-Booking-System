@@ -88,19 +88,60 @@ def create_appointment_preference(db: Session, preference: schemas.AppointmentPr
     
 def create_appointment(db: Session, appointment: schemas.AppointmentCreate):
     try:
+        # Fetch user appointment preference details
+        preference = db.query(AppointmentPreference).filter(AppointmentPreference.appointment_preference_id == appointment.appointment_preference_id).first()
+        if not preference:
+            raise HTTPException(status_code=404, detail="Appointment preference not found.")
+
+        # Fetch dentist details
+        dentist = db.query(Dentist).filter(Dentist.dentist_id == appointment.dentist_id).first()
+        if not dentist:
+            raise HTTPException(status_code=404, detail="Dentist not found.")
+
+        # Convert fetched details into dictionaries
+        patient_preferences = {
+            "patient_name": preference.patient_name,
+            "patient_gender": preference.patient_gender,
+            "patient_age": preference.patient_age,
+            "preferred_dates": preference.preferred_dates,
+            "relation": preference.relation,
+            "special_notes": preference.special_notes
+        }
+
+        dentist_details = {
+            "dentist_name": dentist.dentist_name,
+            "dentist_speciality": dentist.dentist_speciality,
+            "dentist_clinic": dentist.dentist_clinic,
+            "dentist_phone_number": dentist.dentist_phone_number,
+            "dentist_address": dentist.dentist_address
+        }
+
+        # Call the CallHandler
+        from call_handler import CallHandler
+        call_handler = CallHandler(patient_preferences, dentist_details)
+        call_response = call_handler.process_call()
+
+        if not call_response or "appointment_details" not in call_response:
+            raise HTTPException(status_code=500, detail="Failed to process the call for appointment booking.")
+
+        appointment_details = call_response["appointment_details"]
+        print(appointment_details)
+
+        # Create and save the new appointment
         new_appointment = Appointment(
             user_id=appointment.user_id,
             dentist_id=appointment.dentist_id,
-            appointment_date= "",
-            appointment_time= "",
-            appointment_status="In Progress",
+            appointment_date=appointment_details.appointment_date,
+            appointment_time=appointment_details.appointment_time,
+            appointment_status=appointment_details.appointment_status,
             created_at=datetime.utcnow()
         )
-        
+
         db.add(new_appointment)
         db.commit()
         db.refresh(new_appointment)
         return new_appointment
+
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Invalid user_id or dentist_id. Please provide valid references.")
