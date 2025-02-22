@@ -3,6 +3,7 @@ from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from db_conn import create_db
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import schemas
 import uvicorn, os
@@ -12,7 +13,22 @@ import crud
 engine, SessionLocal = create_db()
 models.Base.metadata.create_all(bind=engine)
 
+HOST = os.getenv("HOST")
+PORT = os.getenv("PORT")
+
 app = FastAPI()
+
+origins = [
+    "*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"]
+)
+
 
 load_dotenv()
 
@@ -87,4 +103,4 @@ def get_user_appointments(user_id: int, db: Session = Depends(get_db)):
     return appointments
 
 if __name__ == "__main__":
-    uvicorn.run("init:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("init:app", host=HOST, port=int(PORT), reload=True)
