@@ -44,7 +44,7 @@ def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
     user = crud.authenticate_user(db, username=user_credentials.username, password=user_credentials.password)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    return {"message": "Login successful", "user": user.user_name}
+    return user
 
 @app.get("/get-services", response_model=list[schemas.ServiceResponse])
 def get_services(db: Session = Depends(get_db)):
@@ -70,7 +70,7 @@ def get_dentists(db: Session = Depends(get_db)):
     return dentists
 
 @app.post("/store-appointment-preferences", response_model=schemas.AppointmentPreferenceResponse)
-def get_appointment_preferences(preference: schemas.AppointmentPreferenceCreate, db: Session = Depends(get_db)):
+def store_appointment_preferences(preference: schemas.AppointmentPreferenceCreate, db: Session = Depends(get_db)):
     appointment_preference = crud.create_appointment_preference(db, preference)
     return appointment_preference
 
