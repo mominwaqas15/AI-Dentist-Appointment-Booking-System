@@ -53,7 +53,9 @@ class CallHandler:
         - Keep the conversation **short, concise, and to the point**.
         - Avoid repeating the same information or questions.
         - Speak politely and professionally at all times.
+        - Highlight the user preferred dates clearly.
         - If the receptionist provides information, acknowledge it and move forward without restating it unnecessarily.
+        - If the receptionist speaks any other language, you must speak caller's language then.
 
         **Patient Details:**
         - Name: {patient_preferences.get('patient_name')}
