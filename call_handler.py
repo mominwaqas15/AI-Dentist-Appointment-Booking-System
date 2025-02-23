@@ -31,7 +31,8 @@ class CallHandler:
             'temperature': 0.5,
             'firstSpeaker': 'FIRST_SPEAKER_USER',
             'medium': {'twilio': {}},
-            'transcriptOptional': False
+            'transcriptOptional': False,
+            'languageHint': 'pt'
         }
         
         self.twilio_client = Client(self.twilio_account_sid, self.twilio_auth_token)
@@ -94,7 +95,7 @@ class CallHandler:
         - Stay focused on booking the appointment and avoid digressing.
         - Always wait for the receptionist or dentist to respond before asking the next question.
 
-        Let's begin the call now.
+        Let's begin the call now. Remember to Talk in Portuguese completely as receptionist or doctor doesn't know English.
         """
         return prompt.strip()
     
