@@ -6,6 +6,11 @@ from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
 
+from sqlalchemy.orm import Session
+from models import User
+from datetime import datetime
+from fastapi import HTTPException
+
 def get_user_by_email(db: Session, email: str):
     """
     Check if a user exists with the given email.
@@ -26,7 +31,8 @@ def get_user_by_username(db: Session, username: str):
 
 def create_user(db: Session, user: schemas.UserSignUp):
     new_user = User(
-        full_name=user.full_name,
+        first_name=user.first_name,
+        last_name=user.last_name,
         user_name=user.username,
         user_phone_number=user.phone_number,
         user_age=user.age,
@@ -40,15 +46,13 @@ def create_user(db: Session, user: schemas.UserSignUp):
     db.refresh(new_user)
     return new_user
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user_by_username(db, username)
-    
-    # Ensure user exists
-    if not user:
-        return None
 
-    # Direct string comparison (since no hashing is applied)
-    if user.user_password != password:
+def authenticate_user(db: Session, username_or_email: str, password: str):
+    user = db.query(User).filter(
+        (User.user_name == username_or_email) | (User.user_email == username_or_email)
+    ).first()
+
+    if not user or user.user_password != password:
         return None
 
     return user
@@ -62,12 +66,13 @@ def get_dentists_by_service(db: Session, service_id: int):
 def get_all_dentists(db: Session):
     return db.query(Dentist).all()
 
-def create_appointment_preference(db: Session, preference: schemas.AppointmentPreferenceCreate):
+def create_appointment_preference(db: Session, preference: schemas.AppointmentPreferenceCreate, file_path: str = None):
     try:
         new_preference = AppointmentPreference(
             user_id=preference.user_id,
             dentist_id=preference.dentist_id,
-            patient_name=preference.patient_name,
+            first_name=preference.first_name,  # ✅ Updated field
+            last_name=preference.last_name,    # ✅ Updated field
             patient_gender=preference.patient_gender,
             patient_age=preference.patient_age,
             patient_phone_number=preference.patient_phone_number,
@@ -75,14 +80,14 @@ def create_appointment_preference(db: Session, preference: schemas.AppointmentPr
             preferred_dates=preference.preferred_dates,
             relation=preference.relation,
             special_notes=preference.special_notes,
-            created_at=datetime.utcnow()
+            created_at=datetime.utcnow(),
+            file_path=file_path
         )
         db.add(new_preference)
         db.commit()
         db.refresh(new_preference)
         return new_preference
-
-    except IntegrityError as e:
+    except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Invalid user_id or dentist_id. Please provide valid references.")
     
