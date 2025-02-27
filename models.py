@@ -10,7 +10,8 @@ class User(Base):
     __tablename__ = "user"
     
     user_id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(Text, nullable=False)
+    first_name = Column(Text, nullable=False) 
+    last_name = Column(Text, nullable=False)  
     user_name = Column(Text, nullable=False, unique=True)
     user_phone_number = Column(Text, nullable=False)
     user_email = Column(Text, unique=True)
@@ -78,7 +79,8 @@ class AppointmentPreference(Base):
     appointment_preference_id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.user_id"), nullable=False)
     dentist_id = Column(Integer, ForeignKey("dentist.dentist_id"), nullable=False)
-    patient_name = Column(Text, nullable=False)
+    first_name = Column(Text, nullable=False)  # ✅ Added first_name
+    last_name = Column(Text, nullable=False)   # ✅ Added last_name
     patient_gender = Column(Text, nullable=False)
     patient_age = Column(Text, nullable=False)
     patient_phone_number = Column(Text, nullable=False)
@@ -86,6 +88,7 @@ class AppointmentPreference(Base):
     preferred_dates = Column(Text, nullable=False)
     relation = Column(Text)
     special_notes = Column(Text)
+    file_path = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     user = relationship("User", back_populates="preferences")

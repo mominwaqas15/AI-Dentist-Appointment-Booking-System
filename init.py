@@ -1,20 +1,26 @@
 from fastapi import FastAPI, Depends
 from fastapi import UploadFile, HTTPException
+from fastapi import FastAPI, Depends, File, Form
 from sqlalchemy.orm import Session
 from db_conn import create_db
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import BackgroundTasks
-from typing import List
+from typing import List, Optional
 import schemas, gpt, call_handler
 import uvicorn, os
 import models
+import shutil
 import crud
 from datetime import datetime
 from models import Appointment
 
 engine, SessionLocal = create_db()
 models.Base.metadata.create_all(bind=engine)
+
+UPLOAD_DIRECTORY = "uploads/"
+if not os.path.exists(UPLOAD_DIRECTORY):
+    os.makedirs(UPLOAD_DIRECTORY)
 
 HOST = os.getenv("HOST")
 PORT = os.getenv("PORT")
@@ -61,10 +67,10 @@ def sign_up(user: schemas.UserSignUp, db: Session = Depends(get_db)):
 
 @app.post("/login")
 def login(user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
-    user = crud.authenticate_user(db, username=user_credentials.username, password=user_credentials.password)
+    user = crud.authenticate_user(db, username_or_email=user_credentials.username, password=user_credentials.password)
     if not user:
-        raise HTTPException(status_code=400, detail="Invalid username or password")
-    return {"message": "Login successful", "user": user}
+        raise HTTPException(status_code=400, detail="Invalid username/email or password")
+    return user
 
 @app.get("/get-services", response_model=list[schemas.ServiceResponse])
 def get_services(db: Session = Depends(get_db)):
@@ -90,8 +96,45 @@ def get_dentists(db: Session = Depends(get_db)):
     return dentists
 
 @app.post("/store-appointment-preferences", response_model=schemas.AppointmentPreferenceResponse)
-def get_appointment_preferences(preference: schemas.AppointmentPreferenceCreate, db: Session = Depends(get_db)):
-    appointment_preference = crud.create_appointment_preference(db, preference)
+def store_appointment_preferences(
+    user_id: int = Form(...),
+    dentist_id: int = Form(...),
+    first_name: str = Form(...),  # ✅ Updated from patient_name
+    last_name: str = Form(...),   # ✅ New field added
+    patient_gender: str = Form(...),
+    patient_age: str = Form(...),
+    patient_phone_number: str = Form(...),
+    patient_email_address: str = Form(...),
+    preferred_dates: str = Form(...),
+    relation: Optional[str] = Form(None),
+    special_notes: Optional[str] = Form(None),
+    file: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
+    preference = schemas.AppointmentPreferenceCreate(
+        user_id=user_id,
+        dentist_id=dentist_id,
+        first_name=first_name,  # ✅ Updated field
+        last_name=last_name,    # ✅ Updated field
+        patient_gender=patient_gender,
+        patient_age=patient_age,
+        patient_phone_number=patient_phone_number,
+        patient_email_address=patient_email_address,
+        preferred_dates=preferred_dates,
+        relation=relation,
+        special_notes=special_notes
+    )
+
+    # Handle file upload if provided
+    file_path = None
+    if file:
+        file_path = os.path.join(UPLOAD_DIRECTORY, f"preference_{user_id}_{file.filename}")
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+    # Store the appointment preference in the database
+    appointment_preference = crud.create_appointment_preference(db, preference, file_path)
+    
     return appointment_preference
 
 @app.post("/book-appointment", response_model=dict)

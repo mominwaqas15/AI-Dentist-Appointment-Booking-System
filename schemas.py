@@ -5,7 +5,8 @@ from typing import Optional, List, Dict
 from fastapi import UploadFile, File
 
 class UserSignUp(BaseModel):
-    full_name: str
+    first_name: str  # Changed from full_name
+    last_name: str   # Added last_name
     username: str
     phone_number: str
     age: int
@@ -41,7 +42,8 @@ class DentistListResponse(BaseModel):
 class AppointmentPreferenceCreate(BaseModel):
     user_id: int
     dentist_id: int
-    patient_name: str
+    first_name: str  # ✅ Updated field
+    last_name: str   # ✅ Updated field
     patient_gender: str
     patient_age: str
     patient_phone_number: str
@@ -54,7 +56,8 @@ class AppointmentPreferenceResponse(BaseModel):
     appointment_preference_id: int
     user_id: int
     dentist_id: int
-    patient_name: str
+    first_name: str  # ✅ Updated field
+    last_name: str   # ✅ Updated field
     patient_gender: str
     patient_age: str
     patient_phone_number: str
@@ -62,6 +65,7 @@ class AppointmentPreferenceResponse(BaseModel):
     preferred_dates: str
     relation: Optional[str]
     special_notes: Optional[str]
+    file_path: Optional[str] = None
     created_at: datetime
 
 class AppointmentCreate(BaseModel):
