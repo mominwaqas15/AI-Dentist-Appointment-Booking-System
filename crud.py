@@ -169,7 +169,7 @@ def process_appointment_in_background(db: Session, appointment: schemas.Appointm
 
         # Convert fetched details into dictionaries
         patient_preferences = {
-            "patient_name": preference.patient_name,
+            "patient_name": str(preference.first_name + " " + preference.last_name),
             "patient_gender": preference.patient_gender,
             "patient_age": preference.patient_age,
             "preferred_dates": preference.preferred_dates,

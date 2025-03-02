@@ -14,8 +14,8 @@ class CallHandler:
         self.twilio_account_sid = os.getenv('TWILIO_ACCOUNT_SID')
         self.twilio_auth_token = os.getenv('TWILIO_AUTH_TOKEN')
         self.twilio_phone_number = os.getenv('TWILIO_PHONE_NUMBER')
-        self.destination_phone_number = dentist_details.get("dentist_phone_number")
-        #self.destination_phone_number = "+553123916031"
+        #self.destination_phone_number = dentist_details.get("dentist_phone_number")
+        self.destination_phone_number = "+553123916031"
         
         # Ultravox configuration
         self.ultravox_api_key = os.getenv('ULTRAVOX_API_KEY')
