@@ -173,6 +173,5 @@ def add_dentist(dentist: schemas.DentistCreate, db: Session = Depends(get_db)):
     new_dentist = crud.create_dentist(db, dentist)
     return new_dentist
 
-
 if __name__ == "__main__":
     uvicorn.run("init:app", host=HOST, port=int(PORT), reload=True)

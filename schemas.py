@@ -100,6 +100,7 @@ class DentistServiceResponse(BaseModel):
     service_description: str    
 
 class DentistCreate(BaseModel):
+    dentist_id: int  # ✅ Added field
     dentist_name: str
     years_of_experience: int
     dentist_speciality: str
@@ -108,4 +109,3 @@ class DentistCreate(BaseModel):
     dentist_email: str
     dentist_address: str
     dentist_working_hours: str
-

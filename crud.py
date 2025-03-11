@@ -210,6 +210,7 @@ def process_appointment_in_background(db: Session, appointment: schemas.Appointm
 def create_dentist(db: Session, dentist: schemas.DentistCreate):
     try:
         new_dentist = Dentist(
+            dentist_id=dentist.dentist_id,  # ✅ Accept dentist_id
             dentist_name=dentist.dentist_name,
             years_of_experience=dentist.years_of_experience,
             dentist_speciality=dentist.dentist_speciality,
@@ -226,4 +227,5 @@ def create_dentist(db: Session, dentist: schemas.DentistCreate):
         return new_dentist
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Failed to insert dentist. Email or phone number might already exist.")
+        raise HTTPException(status_code=400, detail="Failed to insert dentist. Dentist ID or Email might already exist.")
+
