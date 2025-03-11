@@ -25,7 +25,7 @@ class User(Base):
 class Dentist(Base):
     __tablename__ = "dentist"
     
-    dentist_id = Column(Integer, primary_key=True, index=True)
+    dentist_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     dentist_name = Column(Text, nullable=False)
     years_of_experience = Column(Integer)
     dentist_speciality = Column(Text)
