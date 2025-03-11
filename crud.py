@@ -209,6 +209,15 @@ def process_appointment_in_background(db: Session, appointment: schemas.Appointm
 
 def create_dentist(db: Session, dentist: schemas.DentistCreate):
     try:
+        # Check if a dentist with the same email or phone number exists
+        existing_dentist = db.query(Dentist).filter(
+            (Dentist.dentist_email == dentist.dentist_email) |
+            (Dentist.dentist_phone_number == dentist.dentist_phone_number)
+        ).first()
+        
+        if existing_dentist:
+            raise HTTPException(status_code=400, detail="A dentist with this email or phone number already exists.")
+
         new_dentist = Dentist(
             dentist_name=dentist.dentist_name,
             years_of_experience=dentist.years_of_experience,
@@ -224,7 +233,7 @@ def create_dentist(db: Session, dentist: schemas.DentistCreate):
         db.commit()
         db.refresh(new_dentist)
         return new_dentist
-    except Exception as e:
+
+    except IntegrityError:
         db.rollback()
-        print()
-        raise HTTPException(status_code=400, detail=f"Error processing appointment: {str(e)}")
+        raise HTTPException(status_code=400, detail="Failed to insert dentist. Possible duplicate entry.")
