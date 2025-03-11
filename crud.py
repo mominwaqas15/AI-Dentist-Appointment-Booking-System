@@ -224,6 +224,7 @@ def create_dentist(db: Session, dentist: schemas.DentistCreate):
         db.commit()
         db.refresh(new_dentist)
         return new_dentist
-    except IntegrityError:
+    except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Failed to insert dentist. Please check for duplicate email or phone number.")
+        print()
+        raise HTTPException(status_code=400, detail=f"Error processing appointment: {str(e)}")
