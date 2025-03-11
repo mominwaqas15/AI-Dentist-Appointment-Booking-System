@@ -168,5 +168,11 @@ def get_user_appointments(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No appointments found for this user.")
     return appointments
 
+@app.post("/add-dentist", response_model=schemas.DentistResponse)
+def add_dentist(dentist: schemas.DentistCreate, db: Session = Depends(get_db)):
+    new_dentist = crud.create_dentist(db, dentist)
+    return new_dentist
+
+
 if __name__ == "__main__":
     uvicorn.run("init:app", host=HOST, port=int(PORT), reload=True)

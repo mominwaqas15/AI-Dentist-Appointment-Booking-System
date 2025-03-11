@@ -206,3 +206,24 @@ def process_appointment_in_background(db: Session, appointment: schemas.Appointm
 
     except Exception as e:
         print(f"Error processing appointment: {str(e)}")
+
+def create_dentist(db: Session, dentist: schemas.DentistCreate):
+    try:
+        new_dentist = Dentist(
+            dentist_name=dentist.dentist_name,
+            years_of_experience=dentist.years_of_experience,
+            dentist_speciality=dentist.dentist_speciality,
+            dentist_clinic=dentist.dentist_clinic,
+            dentist_phone_number=dentist.dentist_phone_number,
+            dentist_email=dentist.dentist_email,
+            dentist_address=dentist.dentist_address,
+            dentist_working_hours=dentist.dentist_working_hours,
+            created_at=datetime.utcnow()
+        )
+        db.add(new_dentist)
+        db.commit()
+        db.refresh(new_dentist)
+        return new_dentist
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Failed to insert dentist. Please check for duplicate email or phone number.")

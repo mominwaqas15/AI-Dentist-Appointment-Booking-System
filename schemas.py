@@ -98,3 +98,14 @@ class DentistServiceResponse(BaseModel):
     service_id: int
     service_name: str
     service_description: str    
+
+class DentistCreate(BaseModel):
+    dentist_name: str
+    years_of_experience: int
+    dentist_speciality: str
+    dentist_clinic: str
+    dentist_phone_number: str
+    dentist_email: str
+    dentist_address: str
+    dentist_working_hours: str
+
